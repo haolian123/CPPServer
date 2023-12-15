@@ -24,27 +24,33 @@ MYSQL* DBConnectionPool::getConnection(){
     }
     return sql;
 }
-
 void DBConnectionPool::Init(const char* host, int port,
-            const char* user,const char* passWord, 
-            const char* DBName, int connectionSize
-        ){
-            assert(connectionSize>0);
-            for(int i=0;i<connectionSize;i++){
-                MYSQL* sql=nullptr;
-                sql=mysql_init(sql);
-                if(!sql){
-                    assert(sql);
-                }
-                sql=mysql_real_connect(sql,host,
-                                user,passWord,
-                                DBName,port,nullptr,0);
-                
-                connectionQueue.emplace(sql);
-            }
-            maxConnection=connectionSize;
-            sem_init(&semId,0,maxConnection);
+                            const char* user, const char* passWord,
+                            const char* DBName, int connectionSize
+                        ){
+    // 确保连接池大小大于0
+    assert(connectionSize > 0);
+    
+    for(int i = 0; i < connectionSize; i++){
+        MYSQL* sql = nullptr;
+        sql = mysql_init(sql);
+        
+        // 检查是否成功初始化 MySQL 连接
+        if(!sql){
+            assert(sql);
         }
+        
+        // 连接到数据库
+        sql = mysql_real_connect(sql, host, user, passWord, DBName, port, nullptr, 0);
+        
+        // 将连接添加到连接队列
+        connectionQueue.emplace(sql);
+    }
+    
+    // 设置最大连接数和初始化信号量
+    maxConnection = connectionSize;
+    sem_init(&semId, 0, maxConnection);
+}
 
 void DBConnectionPool::closePool(){
     std::lock_guard<std::mutex>locker(mutex);
