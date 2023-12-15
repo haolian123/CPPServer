@@ -97,7 +97,7 @@ void HttpRequest::parseBody(const std::string& line){
     state=FINISH;
 }
 
-int HttpRequest::converHex(char ch){
+int HttpRequest::convertHex(char ch){
     if(ch >= 'A' && ch <= 'F') return ch -'A' + 10;
     if(ch >= 'a' && ch <= 'f') return ch -'a' + 10;
     return ch;
@@ -141,7 +141,7 @@ void HttpRequest::parseFromURLEncoded(){
                 body[i] = ' ';
                 break;
             case '%':
-                num = converHex(body[i+1])*16 + converHex(body[i+2]);
+                num = convertHex(body[i+1])*16 + convertHex(body[i+2]);
                 body[i+2] = num%10+'0';
                 body[i+1] = num/10 + '0';
                 i+=2;
