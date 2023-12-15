@@ -9,7 +9,6 @@
 #include<unistd.h>
 #include<cassert>
 #define MAXEVENT 1024
-#define MAX_FD 512
 
 class EpollManager{
 private:

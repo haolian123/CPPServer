@@ -2,7 +2,7 @@
 #include"EpollManager.h"
 
 EpollManager::EpollManager(int maxEvent):
-epollFd(epoll_create(MAX_FD)),events(maxEvent)
+epollFd(epoll_create(512)),events(maxEvent)
 {
     assert(epollFd>=0&&events.size()>0);
 }
@@ -39,7 +39,7 @@ bool EpollManager::deleteFd(int fd){
     return epoll_ctl(epollFd,EPOLL_CTL_DEL,fd,&epollEvent);
 }
 
-int EpollManager::wait(int timeout=-1){
+int EpollManager::wait(int timeout){
     return epoll_wait(epollFd,&events[0],static_cast<int>(events.size()),timeout);
 }
 
