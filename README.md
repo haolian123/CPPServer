@@ -29,7 +29,6 @@
 - `main.cpp`: 程序入口。
 - `Makefile`: 用于编译项目的 Makefile 文件。
 - `resources/`: 包含静态资源如 HTML、CSS、JS 文件和图片等。
-- `test/`: 测试相关文件。
 - `ThreadPool.h`: 线程池的实现。
 - `TimerHandler*`: 定时器处理类。
 - `WebServer*`: Web 服务器主类。
@@ -65,7 +64,32 @@ make
 ./bin/server
 ```
 
+### 在浏览器输入
+
+```
+127.0.0.1/1316
+```
+
+## 运行效果
+
+图片
+
+![image-20231215194726861](README.assets/image-20231215194726861.png)
+
+视频
+
+![image-20231215194859287](README.assets/image-20231215194859287.png)
+
+主页
+
+![image-20231215195013293](README.assets/image-20231215195013293.png)
+
+登录
+
+![image-20231215194918573](README.assets/image-20231215194918573.png)
+
 ## 配置说明
+
 在 `main` 函数中配置服务器参数：
 - `port`: 服务器端口。
 - `trigMode`: 触发模式。
