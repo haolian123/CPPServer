@@ -82,7 +82,7 @@ void TimerHandler::doWork(int id){
         return;
     }
     size_t i= ref[id];
-    timerNode node=heap[i];
+    TimerNode node=heap[i];
     node.callBackFunction();
     deleteNode(i);
 }
@@ -97,7 +97,7 @@ void TimerHandler::tick(){
         return;
     }
     while(!heap.empty()){
-        timerNode node=heap.front();
+        TimerNode node=heap.front();
         if(std::chrono::duration_cast<MilliSeconds>(node.expires - Clock::now()).count() > 0) { 
             break; 
         }
