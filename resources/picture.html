@@ -1,0 +1,86 @@
+<!--
+ * @Author       : mark
+ * @Date         : 2020-06-30
+ * @copyleft GPL 2.0
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+     <meta charset="UTF-8">
+
+     <title>图片</title>
+     <link rel="icon" href="images/favicon.ico">
+     <link rel="stylesheet" href="css/bootstrap.min.css">
+     <link rel="stylesheet" href="css/animate.css">
+     <link rel="stylesheet" href="css/magnific-popup.css">
+     <link rel="stylesheet" href="css/font-awesome.min.css">
+
+     <!-- Main css -->
+     <link rel="stylesheet" href="css/style.css">
+
+     
+
+</head>
+
+<body data-spy="scroll" data-target=".navbar-collapse" data-offset="50" style="background: linear-gradient(to right, #6dd5ed, #2193b0);">
+
+     <!-- PRE LOADER -->
+     <div class="preloader">
+          <div class="spinner">
+               <span class="spinner-rotate"></span>
+          </div>
+     </div>
+
+     <div id="navbar-placeholder"></div>
+     
+     <div class="container">
+          <div class="row">
+              <div align="center">
+                  <img src="images/image1.jpg" style="width:906px; height:506px; margin-top: 100px;" />
+              </div>
+          </div>
+      </div>
+     <div class="container">
+          <div class="row">
+              <div align="center">
+                  <img src="images/image2.jpg" style="width:906px; height:506px; margin-top: 100px;" />
+              </div>
+          </div>
+      </div>
+     <div class="container">
+          <div class="row">
+              <div align="center">
+                  <img src="images/image3.jpg" style="width:906px; height:506px; margin-top: 100px;" />
+              </div>
+          </div>
+      </div>
+     <div class="container">
+          <div class="row">
+              <div align="center">
+                  <img src="images/image4.jpg" style="width:906px; height:506px; margin-top: 100px;" />
+              </div>
+          </div>
+      </div>
+      
+  
+     <!-- SCRIPTS -->
+     <script src="js/jquery.js"></script>
+     <script src="js/bootstrap.min.js"></script>
+     <script src="js/smoothscroll.js"></script>
+     <script src="js/jquery.magnific-popup.min.js"></script>
+     <script src="js/magnific-popup-options.js"></script>
+     <script src="js/wow.min.js"></script>
+     <script src="js/custom.js"></script>
+     <script>
+          fetch('navbar.html')
+              .then(response => response.text())
+              .then(data => {
+                  document.getElementById('navbar-placeholder').innerHTML = data;
+              });
+      </script>
+
+</body>
+
+</html>
