@@ -72,36 +72,38 @@ void  Buffer::append(const Buffer&buff){
     append(buff.peek(),buff.readableBytes());
 }
 
-ssize_t  Buffer::readFd(int fd, int* saveErrno){
-    char buff[65535];
-    struct iovec iov[2];
-    const size_t writable=writeableBytes();
-    iov[0].iov_base=begin()+writePosition;
-    iov[0].iov_len=writable;
-    iov[1].iov_base=buff;
-    iov[1].iov_len=sizeof(buff);
+ssize_t Buffer::readFd(int fd, int* saveErrno){
+    char buff[65535]; // 临时缓冲区
+    struct iovec iov[2]; // iovec结构数组，用于readv操作
+    const size_t writable = writeableBytes(); // 可写入字节数
+    iov[0].iov_base = begin() + writePosition; // 指向Buffer中的写入位置
+    iov[0].iov_len = writable; // 第一部分长度为Buffer的可写长度
+    iov[1].iov_base = buff; // 第二部分为临时缓冲区
+    iov[1].iov_len = sizeof(buff); // 第二部分长度
 
-    const ssize_t len = readv(fd,iov,2);
-    if(len<0){
-        *saveErrno=errno;
-    }else if(static_cast<size_t>(len)<=writable){
-        writePosition+=len;
-    } else{
-        writePosition=buffer.size();
-        append(buff,len-writable);
+    const ssize_t len = readv(fd, iov, 2); // 使用readv从文件描述符读取数据
+    if(len < 0){
+        *saveErrno = errno; // 如果读取失败，设置错误号
+    } else if(static_cast<size_t>(len) <= writable){
+        writePosition += len; // 如果读取长度小于等于可写长度，更新写入位置
+    } else {
+        writePosition = buffer.size(); // 如果超出可写长度，填满Buffer
+        append(buff, len - writable); // 将剩余数据追加到Buffer
     }
     return len;
 }
-ssize_t  Buffer::writeFd(int fd,int * saveErrno){
-    size_t readSize=readableBytes();
-    ssize_t len=write(fd,peek(),readSize);
-    if(len<0){
-        *saveErrno=errno;
+
+ssize_t Buffer::writeFd(int fd, int * saveErrno){
+    size_t readSize = readableBytes(); // 可读取的字节数
+    ssize_t len = write(fd, peek(), readSize); // 将Buffer中的数据写入文件描述符
+    if(len < 0){
+        *saveErrno = errno; // 如果写入失败，设置错误号
         return len;
     }
-    readPosition+=len;
+    readPosition += len; // 更新读取位置
     return len;
 }
+
 
 
 char*  Buffer::begin(){
@@ -110,14 +112,23 @@ char*  Buffer::begin(){
 const char*  Buffer::begin() const{
     return &*buffer.begin();
 }
-void  Buffer::makeSpace(size_t len){
-    if(writeableBytes()+prependableBytes()<len){
-        buffer.resize(writePosition+len+1);
-    }else{
-        size_t readable=readableBytes();
-        std::copy(begin()+readPosition,begin()+writePosition,begin());
-        readPosition=0;
-        writePosition= readPosition+ readable;
-        assert(readable==readableBytes());
+
+void Buffer::makeSpace(size_t len) {
+    // 如果可写字节数加上前置字节数小于需要的长度
+    if (writeableBytes() + prependableBytes() < len) {
+        // 调整缓冲区大小
+        buffer.resize(writePosition + len + 1);
+    } else {
+        // 计算可读字节数
+        size_t readable = readableBytes();
+        
+        // 将数据从读位置开始复制到写位置
+        std::copy(begin() + readPosition, begin() + writePosition, begin());
+        
+        // 更新读位置和写位置
+        readPosition = 0;
+        writePosition = readPosition + readable;
+        
+        assert(readable == readableBytes());
     }
 }
