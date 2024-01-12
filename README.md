@@ -105,6 +105,68 @@ make
 - `logLevel`: 日志级别。
 - `asyncQueueSize`: 异步队列大小。
 
+## 压力测试
+
+
+### 测试环境：
+   - 工具：Webbench - Simple Web Benchmark 1.5
+   - 编译：
+     - cd ./webbench-1.5
+     - make
+
+### 测试
+1. 测试 1：
+   - **命令**：
+     ```
+     ./webbench-1.5/webbench -c 1000 -t 10 http://127.0.0.1:1316/
+     ```
+   - **配置**：1000 客户端, 运行时间 10 秒
+   - **结果**：
+     - 速度：66510 页面/分钟, 2614378 字节/秒
+     - 请求：11085 成功, 0 失败
+
+2. **测试 2**：
+   - **命令**：
+     ```
+     ./webbench-1.5/webbench -c 5000 -t 10 http://127.0.0.1:1316/
+     ```
+   - **配置**：5000 客户端, 运行时间 10 秒
+   - **结果**：
+     - 错误信息：`problems forking worker no. 4284`, `fork failed.: Resource temporarily unavailable`
+   - **原因分析**：
+     - 由于是在虚拟机进行的测试，系统资源（如进程数、内存等）限制了测试，无法创建更多的进程以满足 5000 个客户端的需求。
+
+### Webbench 编译错误解决
+1. **编译 Webbench**：
+   在webbench-1.5目录下运行 `make webbench` 时出现错误。
+
+2. **错误 1**：
+   - **描述**：`fatal error: rpc/types.h: No such file or directory`
+   - **解决方法**：
+     1. 安装 `libtirpc-dev` 包：
+        ```
+        sudo apt-get install -y libtirpc-dev
+        ```
+     2. 创建软连接：
+        ```
+        sudo ln -s /usr/include/tirpc/rpc/types.h /usr/include/rpc
+        ```
+
+3. **错误 2**：
+   - **描述**：`fatal error: netconfig.h: No such file or directory`
+   - **解决方法**：创建另一个软连接：
+     ```
+     sudo ln -s /usr/include/tirpc/netconfig.h /usr/include
+     ```
+
+4. **错误 3**：
+   - **描述**：`/bin/sh: 1: ctags: not found`
+   - **解决方法**：安装 `ctags`：
+     ```
+     sudo apt-get install universal-ctags
+     ```
+
+
 ##  注意事项
 - 确保在运行服务器前，MySQL 服务已启动并可访问。
 - 根据服务器和数据库的实际配置调整 `main` 函数中的参数。
