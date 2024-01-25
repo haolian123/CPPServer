@@ -67,18 +67,23 @@ void BlockQueue<T>::clear() {
     deque.clear();
 }
 
-template<class T>
-T BlockQueue<T>::front() {
-    std::lock_guard<std::mutex> locker(mutex);
+template<typename T>
+T BlockQueue<T>::front(){
+    std::unique_lock<std::mutex>lock(this->mutex);
+    condConsumer.wait(lock,[&](){
+        return deque.size()>0;
+    });
     return deque.front();
 }
 
-template<class T>
-T BlockQueue<T>::back() {
-    std::lock_guard<std::mutex> locker(mutex);
+template<typename T>
+T BlockQueue<T>::back(){
+    std::unique_lock<std::mutex>lock(this->mutex);
+    condConsumer.wait(lock,[&](){
+        return deque.size()>0;
+    });
     return deque.back();
 }
-
 template<class T>
 size_t BlockQueue<T>::size() {
     std::lock_guard<std::mutex> locker(mutex);
@@ -126,11 +131,11 @@ bool BlockQueue<T>::full() {
 template<class T>
 bool BlockQueue<T>::pop(T& item) {
     std::unique_lock<std::mutex> locker(mutex);
-    while (deque.empty()) {
+    while (deque.empty() && !isClose) { // 检查队列是否为空且未关闭
         condConsumer.wait(locker);
-        if (isClose) {
-            return false;
-        }
+    }
+    if (isClose && deque.empty()) { // 如果队列已关闭且为空，则退出
+        return false;
     }
     item = deque.front();
     deque.pop_front();
