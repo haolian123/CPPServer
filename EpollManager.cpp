@@ -21,23 +21,24 @@ bool EpollManager::addFd(int fd, uint32_t events){
     return epoll_ctl(epollFd,EPOLL_CTL_ADD,fd,&epollEvent)==0;
 }
 
-bool EpollManager::modifyFd(int fd, uint32_t events){
-    if(fd<0){
+bool EpollManager::modifyFd(int fd, uint32_t events) {
+    if (fd < 0) {
         return false;
     }
-    epoll_event epollEvent={0};
-    epollEvent.data.fd=fd;
-    epollEvent.events=events;
-    return epoll_ctl(epollFd,EPOLL_CTL_MOD,fd,&epollEvent);
+    epoll_event epollEvent = {0};
+    epollEvent.data.fd = fd;
+    epollEvent.events = events;
+    return epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &epollEvent) == 0; 
 }
 
-bool EpollManager::deleteFd(int fd){
-    if(fd<0){
+bool EpollManager::deleteFd(int fd) {
+    if (fd < 0) {
         return false;
     }
-    epoll_event epollEvent={0};
-    return epoll_ctl(epollFd,EPOLL_CTL_DEL,fd,&epollEvent);
+    epoll_event epollEvent = {0};
+    return epoll_ctl(epollFd, EPOLL_CTL_DEL, fd, &epollEvent) == 0; 
 }
+
 
 int EpollManager::wait(int timeout){
     return epoll_wait(epollFd,&events[0],static_cast<int>(events.size()),timeout);
