@@ -5,8 +5,8 @@
 
 class AuthManager {
 public:
-    AuthManager();
-    ~AuthManager();
+    AuthManager()=default;
+    ~AuthManager()=default;
 
     static bool userVerify(const std::string& name, const std::string& pwd, bool isLogin);
 };
