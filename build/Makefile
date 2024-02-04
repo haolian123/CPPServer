@@ -21,8 +21,7 @@ all: $(TARGET)
 
 # 链接目标
 $(TARGET): 
-	$(CXX) $(CFLAGS) -o ../bin/$@ $(SRCS) -pthread -lmysqlclient
-
+	$(CXX) $(CFLAGS) -I$(HIREDIS_INC) -L$(HIREDIS_LIB) -o ../bin/$@ $(SRCS) -pthread -lmysqlclient -lhiredis
 
 clean:
 	rm -f ../bin/$(TARGET)
