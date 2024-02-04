@@ -9,6 +9,8 @@ TARGET = server
 
 # 源代码文件列表
 SRCS = $(wildcard $(SRCDIR)/network/*.cpp) \
+       $(wildcard $(SRCDIR)/network/http_request/*.cpp)\
+       $(wildcard $(SRCDIR)/network/http_response/*.cpp)\
        $(wildcard $(SRCDIR)/db/*.cpp) \
        $(wildcard $(SRCDIR)/server/*.cpp) \
        $(wildcard $(SRCDIR)/utility/*.cpp) \
