@@ -1,26 +1,6 @@
 #include"HttpResponse.h"
+#include<iostream>
 
-const std::unordered_map<std::string, std::string> HttpResponse::SUFFIX_TYPE = {
-    { ".html",  "text/html" },
-    { ".xml",   "text/xml" },
-    { ".xhtml", "application/xhtml+xml" },
-    { ".txt",   "text/plain" },
-    { ".rtf",   "application/rtf" },
-    { ".pdf",   "application/pdf" },
-    { ".word",  "application/nsword" },
-    { ".png",   "image/png" },
-    { ".gif",   "image/gif" },
-    { ".jpg",   "image/jpeg" },
-    { ".jpeg",  "image/jpeg" },
-    { ".au",    "audio/basic" },
-    { ".mpeg",  "video/mpeg" },
-    { ".mpg",   "video/mpeg" },
-    { ".avi",   "video/x-msvideo" },
-    { ".gz",    "application/x-gzip" },
-    { ".tar",   "application/x-tar" },
-    { ".css",   "text/css "},
-    { ".js",    "text/javascript "},
-};
 
 const std::unordered_map<int, std::string> HttpResponse::CODE_STATUS = {
     { 200, "OK" },
@@ -40,27 +20,24 @@ HttpResponse::HttpResponse(){
     code=-1;
     path=srcDir="";
     isKeepAlive=false;
-    mmFile=nullptr;
-    mmFileStat={0};
 }
 
 HttpResponse::~HttpResponse(){
-    unMapFile();
+    fileMapper.unMapFile();
 }
 
 
 void HttpResponse::init(const std::string& srcDir, std::string&path,bool isKeepAlive,int code){
     assert(srcDir!="");
-    if(mmFile){unMapFile();}
+    if(fileMapper.file()){fileMapper.unMapFile();}
     this->code=code;
     this->isKeepAlive=isKeepAlive;
     this->path=path;
     this->srcDir=srcDir;
-    mmFile=nullptr;
-    mmFileStat={0};
 }
 
 void HttpResponse::makeResponse(Buffer& buffer){
+    struct stat& mmFileStat=fileMapper.fileStat();
     if(stat((srcDir+path).data(),&mmFileStat)<0||S_ISDIR(mmFileStat.st_mode)){
         code=404;
     }else if(!(mmFileStat.st_mode&S_IROTH)){
@@ -75,17 +52,17 @@ void HttpResponse::makeResponse(Buffer& buffer){
 }
 
 char* HttpResponse::file(){
-    return mmFile;
+    return fileMapper.file();
 }
 
 size_t HttpResponse::fileLen()const{
-    return mmFileStat.st_size;
+    return fileMapper.fileLen();
 }
 
 void HttpResponse::errorHTML(){
     if(CODE_PATH.count(code)==1){
         path=CODE_PATH.find(code)->second;
-        stat((srcDir+path).data(),&mmFileStat);
+        stat((srcDir+path).data(),&fileMapper.fileStat());
     }
 }
 
@@ -108,7 +85,7 @@ void HttpResponse::addHeader(Buffer& buffer){
     }else{
         buffer.append("close\r\n");
     }
-    buffer.append("Content-type: " + getFileType() + "\r\n");
+    buffer.append("Content-type: " +  getFileType() + "\r\n");
 }
 
 void HttpResponse::addContent(Buffer&buffer){
@@ -118,38 +95,25 @@ void HttpResponse::addContent(Buffer&buffer){
         return;
     }
     
-    void* mmRet = mmap(0, mmFileStat.st_size, PROT_READ, MAP_PRIVATE, srcFd, 0);
+    void* mmRet = mmap(0, fileMapper.fileStat().st_size, PROT_READ, MAP_PRIVATE, srcFd, 0);
     
     if (mmRet == MAP_FAILED) {
         errorContent(buffer, "File NotFound");
         close(srcFd); 
         return;
     }
-    mmFile = (char*)mmRet;
+    fileMapper.setFile((char*)mmRet);
     close(srcFd);
-    buffer.append("Content-length: " + std::to_string(mmFileStat.st_size) + "\r\n\r\n");
+    buffer.append("Content-length: " + std::to_string(fileMapper.fileStat().st_size) + "\r\n\r\n");
 }
 
-void HttpResponse::unMapFile(){
-    if(mmFile){
-        munmap(mmFile,mmFileStat.st_size);
-        mmFile=nullptr;
-    }
-}
+
 
 std::string HttpResponse::getFileType(){
-    std::string::size_type idx = path.find_last_of('.');
-    if(idx==std::string::npos){
-        return "text/plain";
-    }
-    std::string suffix=path.substr(idx);
-    if(SUFFIX_TYPE.count(suffix)==1){
-        return SUFFIX_TYPE.find(suffix)->second;
-    }
-    return "text/plain";
+    return mimeTypes.getFileType(path);
 }
 
-void HttpResponse::errorContent(Buffer& buff,std::string message){
+void HttpResponse::errorContent(Buffer& buff,const std::string& message){
     std::string body;
     std::string status;
     body += "<html><title>Error</title>";
@@ -165,4 +129,8 @@ void HttpResponse::errorContent(Buffer& buff,std::string message){
 
     buff.append("Content-length: " + std::to_string(body.size()) + "\r\n\r\n");
     buff.append(body);
+}
+
+void HttpResponse::unMapFile(){
+    fileMapper.unMapFile();
 }
