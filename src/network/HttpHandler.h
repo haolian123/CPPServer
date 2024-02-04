@@ -6,8 +6,8 @@
 #include <arpa/inet.h>   
 #include <stdlib.h>      
 #include <errno.h>      
-#include "DBConnectionPool.h"
-#include "DBConnectionRAII.h"
+#include "../db/DBConnectionPool.h"
+#include "../db/DBConnectionRAII.h"
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 #include "Buffer.h"

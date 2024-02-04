@@ -1,5 +1,5 @@
 #include <unistd.h>
-#include "WebServer.h"
+#include "server/WebServer.h"
 
 int main() {
     int port=1316;

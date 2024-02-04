@@ -8,8 +8,8 @@
 #include <errno.h>     
 #include <mysql/mysql.h>  //mysql
 #include "Buffer.h"
-#include "DBConnectionPool.h"
-#include "DBConnectionRAII.h"
+#include "../db/DBConnectionPool.h"
+#include "../db/DBConnectionRAII.h"
 
 class HttpRequest {
 public:

@@ -10,7 +10,7 @@
 #include <sys/stat.h> 
 
 #include"BlockQueue.h"
-#include"Buffer.h"
+#include"../network/Buffer.h"
 
 class Log {
 private:
