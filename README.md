@@ -2,7 +2,7 @@
 ___
 ​	这是一个在Linux环境下使用C++开发的高性能网络服务器项目，采用了Epoll I/O多路复用技术、线程池、数据库连接池以及Redis缓存处理。而且通过引入设计模式提升了代码的结构和维护性，同时采用多线程并发处理机制与Redis缓存策略，优化了客户端请求的处理流程。
 
-​	编写的过程中参考了[TinyWebServer]([qinguoyi/TinyWebServer: :fire: Linux下C++轻量级WebServer服务器 (github.com)](https://github.com/qinguoyi/TinyWebServer))和[WebServer: C++ Linux WebServer服务器]([markparticle/WebServer: C++ Linux WebServer服务器 (github.com)](https://github.com/markparticle/WebServer))这两个项目，并对项目进行了一些改进，包括**代码重构、修复组件的bug、使用GoogleTest框架编写单元测试与引入redis缓存机制**等。
+​	编写的过程中参考了[TinyWebServer](https://github.com/qinguoyi/TinyWebServer)和[WebServer: C++ Linux WebServer服务器](https://github.com/markparticle/WebServer)这两个项目，并对项目进行了一些改进，包括**代码重构、修复组件的bug、使用GoogleTest框架编写单元测试与引入redis缓存机制**等。
 
 ## 特点
 
