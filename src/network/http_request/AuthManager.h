@@ -10,6 +10,13 @@
 #include <string>
 #include "../../db/RedisManager.h"
 class AuthManager {
+    static RedisManager* redisManager;
+
+    static bool verifyFromCache(const std::string& name, std::string& correctPassword);
+    static bool verifyOrRegisterFromDB(MYSQL*& dbConnection, bool isLogin, const std::string& name, const std::string& passWord);
+    static bool insertUserIntoDB(MYSQL*& dbConnection, const std::string& name, const std::string& passWord);
+    static bool updateCache(const std::string& name, const std::string& passWord);
+
 public:
     AuthManager()=default;
     ~AuthManager()=default;
