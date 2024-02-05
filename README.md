@@ -1,41 +1,153 @@
-## 项目概述
+## 概述
 ___
-​	这是一个基于Linux下C++ 的网络服务器项目。通过使用 Epoll I/O 多路复用技术、线程池、数据库连接池等现代网络编程技术，提供了服务器环境。服务器支持基本的 HTTP 功能，并通过多线程处理客户端请求，实现高效的连接处理。
+​	这是一个在Linux环境下使用C++开发的高性能网络服务器项目，采用了Epoll I/O多路复用技术、线程池、数据库连接池以及Redis缓存处理。而且通过引入设计模式提升了代码的结构和维护性，同时采用多线程并发处理机制与Redis缓存策略，优化了客户端请求的处理流程。
 
-​	编写该项目的是为了熟悉linux下的网络编程，还可以顺便熟悉线程池、连接池、Epoll等技术。编写的过程中参考了《TinyWebServer》和《WebServer: C++》这两个项目。
+​	编写的过程中参考了[TinyWebServer]([qinguoyi/TinyWebServer: :fire: Linux下C++轻量级WebServer服务器 (github.com)](https://github.com/qinguoyi/TinyWebServer))和[WebServer: C++ Linux WebServer服务器]([markparticle/WebServer: C++ Linux WebServer服务器 (github.com)](https://github.com/markparticle/WebServer))这两个项目，并对项目进行了一些改进，包括**代码重构、修复组件的bug、使用GoogleTest框架编写单元测试与引入redis缓存机制**等。
 
-## 功能特点
+## 特点
+
+---
+
+- **多线程处理**：利用线程池处理并发请求，提高服务器处理能力。通过分配独立线程给每个网络请求，确保了高并发下的响应速度和稳定性。
+
+- **Epoll I/O 多路复用**：使用 Epoll 实现 I/O 事件的高效处理。Epoll 可以同时监控多个描述符，当某个描述符就绪时，能够快速响应，大大提升了网络I/O性能。
+
+- **数据库连接池**：维护数据库连接，提高数据库操作的效率。连接池避免了每次查询数据库时都建立和销毁连接的开销，从而加快了数据库操作速度。
+
+- **定时器支持**：通过定时器处理非活跃连接，保持服务器性能。定时器能够定期检查并关闭闲置的连接，释放资源，保证服务器的高效运行。
+
+- **灵活的配置**：支持多种服务器配置，包括端口、超时时间、日志级别等。易于根据不同的运行环境和需求进行调整，提升服务器的灵活性和可用性。
+
+- **Redis缓存**：使用 Redis 进行数据缓存，降低数据库访问频率，提升数据处理速度。利用 Redis 的高性能和持久化特性，有效缓解了数据库的压力，加速了数据访问。
+
+- **设计模式应用**：在代码编写中引入多种设计模式，如单例模式、RAII模式、单一职责原则等，增强了代码的可读性、可维护性和扩展性。
+
 ___
-- **多线程处理**：利用线程池处理并发请求，提高服务器处理能力。
-- **Epoll I/O 多路复用**：使用 Epoll 实现 I/O 事件的高效处理。
-- **数据库连接池**：维护数据库连接，提高数据库操作的效率。
-- **定时器支持**：通过定时器处理非活跃连接，保持服务器性能。
-- **灵活的配置**：支持多种服务器配置，包括端口、超时时间、日志级别等。
+
+### 文件结构
+
+```
+.
+├── bin
+├── build
+├── log
+├── Makefile
+├── README.assets
+├── README.md
+├── resources
+├── src
+├── test
+└── webbench-1.5
+```
+
+### 说明
+
+- `bin/`: 存放编译后生成的可执行文件。
+- `build/`: 存放编译生成的文件。
+- `log/`: 存放程序运行时生成的日志文件。
+- `Makefile`: 项目的make编译配置文件，用于控制项目的编译过程。
+- `README.assets/`: 存放README.md文件中使用的资源，如图片。
+- `README.md`: 项目的说明文件，介绍项目的功能、使用方法等信息。
+- `resources/`: 存放项目运行时需要的资源文件，如配置文件、静态页面等。
+- `src/`: 存放项目的源代码文件和相关的头文件。
+    - `db/`: 数据库连接和缓存管理相关的代码。
+    - `network/`: 网络通信和HTTP协议处理相关的代码。
+    - `server/`: 服务器主要运行逻辑的代码。
+    - `utility/`: 提供日志、线程池、定时器等工具的代码。
+- `test/`: 使用Gtest框架编写的单元测试和集成测试。
+- `webbench-1.5/`: 包含WebBench工具，用于对web服务器进行压力测试。
 
 ## 类结构
-___
-- **WebServer**：主服务器类，负责服务器的初始化、运行和资源管理。
-- **EpollManager**：Epoll 事件管理。
-- **ThreadPool**：线程池管理。
-- **DBConnectionPool**：数据库连接池管理。
-- **TimerHandler**：定时器处理。
-- **HttpHandler**：处理 HTTP 请求和响应。
 
-## 项目文件结构
 ___
+### 源码文件结构
 
-- `BlockQueue.h`: 阻塞队列的实现。
-- `Buffer.cpp` & `Buffer.h`: 缓冲区的实现。
-- `DBConnection*`: 数据库连接相关类。
-- `EpollManager*`: Epoll 事件处理相关类。
-- `Http*`: HTTP 请求和响应处理相关类。
-- `Log*`: 日志系统的实现。
-- `main.cpp`: 程序入口。
-- `Makefile`: 用于编译项目的 Makefile 文件。
-- `resources/`: 包含静态资源如 HTML、CSS、JS 文件和图片等。
-- `ThreadPool.h`: 线程池的实现。
-- `TimerHandler*`: 定时器处理类。
-- `WebServer*`: Web 服务器主类。
+```
+src
+├── db
+│   ├── DBConnectionPool.cpp
+│   ├── DBConnectionPool.h
+│   ├── DBConnectionRAII.h
+│   └── RedisManager.h
+├── main.cpp
+├── network
+│   ├── Buffer.cpp
+│   ├── Buffer.h
+│   ├── EpollManager.cpp
+│   ├── EpollManager.h
+│   ├── HttpHandler.cpp
+│   ├── HttpHandler.h
+│   ├── http_request
+│   │   ├── AuthManager.cpp
+│   │   ├── AuthManager.h
+│   │   ├── HttpRequest.cpp
+│   │   ├── HttpRequest.h
+│   │   ├── HttpRequestParser.cpp
+│   │   ├── HttpRequestParser.h
+│   │   └── URLUtility.h
+│   └── http_response
+│       ├── FileMapper.cpp
+│       ├── FileMapper.h
+│       ├── HttpResponse.cpp
+│       ├── HttpResponse.h
+│       ├── MimeTypes.cpp
+│       └── MimeTypes.h
+├── server
+│   ├── WebServer.cpp
+│   └── WebServer.h
+└── utility
+    ├── BlockQueue.h
+    ├── Log.cpp
+    ├── Log.h
+    ├── ThreadPool.h
+    ├── TimerHandler.cpp
+    └── TimerHandler.h
+```
+
+### 说明
+
+#### db 模块
+负责数据库连接和缓存管理。
+- `DBConnectionPool`: 管理数据库连接池，提供数据库连接和释放接口。
+- `DBConnectionRAII`: 利用RAII机制管理数据库连接资源，确保资源的正确释放。
+- `RedisManager`: 封装对Redis操作的接口，提供缓存服务。
+
+#### network 模块
+负责网络通信和HTTP协议处理。
+- `Buffer`: 网络数据缓冲区管理。
+- `EpollManager`: 封装epoll相关操作，实现高效的事件处理。
+- `HttpHandler`: 处理HTTP请求和响应。
+- `HttpRequest`: 表示HTTP请求，解析请求内容。
+- `HttpRequestParser`: 解析HTTP请求的具体内容。
+- `AuthManager`: 处理用户认证相关逻辑。
+- `URLUtility`: 提供URL处理的工具函数。
+
+##### http_request 子目录
+HTTP请求的处理。
+- `AuthManager.cpp`: 实现认证管理相关功能。
+- `AuthManager.h`: 认证管理类的声明。
+- `HttpRequest.cpp`: 实现HTTP请求的处理逻辑。
+- `HttpRequest.h`: HTTP请求类的声明。
+- `HttpRequestParser.cpp`: 实现HTTP请求解析。
+- `HttpRequestParser.h`: HTTP请求解析类的声明。
+- `URLUtility.h`: 提供URL处理的工具函数。
+
+##### http_response 子目录
+HTTP响应的生成和处理。
+- `FileMapper`: 映射服务器文件系统，支持文件请求的处理。
+- `HttpResponse`: 构建HTTP响应，包括状态码、头部和正文。
+- `MimeTypes`: 管理MIME类型，支持不同类型文件的响应。
+
+#### server 模块
+负责服务器的主要运行逻辑。
+- `WebServer`: 服务器主类，管理服务的启动、运行和停止。
+
+#### utility 模块
+提供日志、线程池、定时器等工具类。
+- `BlockQueue`: 阻塞队列，用于线程间的同步。
+- `Log`: 提供日志记录功能。
+- `ThreadPool`: 线程池管理。
+- `TimerHandler`: 定时器处理逻辑，用于处理超时事件。
 
 ## 运行
 ___
@@ -278,8 +390,10 @@ ___
      ```
    - **配置**：5000 客户端, 运行时间 10 秒
    - **结果**：
+     
      - 错误信息：`problems forking worker no. 4284`, `fork failed.: Resource temporarily unavailable`
    - **原因分析**：
+     
      - 由于是在虚拟机进行的测试，系统资源（如进程数、内存等）限制了测试，无法创建更多的进程以满足 5000 个客户端的需求。
 
 ### Webbench 编译错误解决
